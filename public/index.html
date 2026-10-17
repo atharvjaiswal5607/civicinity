@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#062d43">
+  <title>Civicinity — Civic Issue Reporting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="site-header">
+    <a class="brand" href="#" id="homeLink"><span class="brand-mark">C</span><span>CIVIC<span class="brand-light">INICITY</span><small>SMART CIVIC RESPONSE</small></span></a>
+    <nav id="mainNav" class="main-nav">
+      <a href="#how">How it works</a><a href="#impact">Our impact</a>
+      <button class="btn btn-outline" id="loginNav">Log in</button><button class="btn btn-primary" id="reportNav">Report an issue <span>↗</span></button>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> YOUR CITY. YOUR VOICE.</div>
+        <h1>Small reports.<br><em>Big change.</em></h1>
+        <p>See a pothole, overflowing bin, or broken streetlight? Report it in minutes. Track the response. Help make your neighbourhood better.</p>
+        <div class="hero-actions"><button class="btn btn-primary btn-lg" id="heroReport">Report a civic issue <span>↗</span></button><button class="btn btn-white btn-lg" id="trackOpen">Track a complaint <span>→</span></button></div>
+        <div class="trust-row"><div class="avatar-stack"><i>✦</i><i>⌂</i><i>✓</i></div><span>Building more responsive communities, together.</span></div>
+      </div>
+      <div class="hero-visual">
+        <div class="visual-glow"></div><div class="map-card"><div class="map-top"><span><b class="dot-green"></b> LIVE ISSUE MAP</span><span class="map-tag">DEMO VIEW</span></div>
+          <div id="miniMap"></div>
+          <div class="map-legend"><span><i class="pin pin-red"></i>Road damage</span><span><i class="pin pin-yellow"></i>Sanitation</span><span><i class="pin pin-blue"></i>Streetlight</span></div>
+        </div>
+        <div class="floating-card float-one"><span class="float-icon green">✓</span><span><b>Every report matters</b><small>Track progress transparently</small></span></div>
+        <div class="floating-card float-two"><span class="float-icon orange">↗</span><span><b>One connected city</b><small>Citizens + civic teams</small></span></div>
+        <div class="hero-number"><b>01</b><span>ISSUE REPORTED<br>CHANGE STARTS HERE</span></div>
+      </div>
+      <div class="hero-bottom"><span>01 / REPORT</span><span>02 / ROUTE</span><span>03 / RESOLVE</span><div></div><span>SCROLL TO EXPLORE ↓</span></div>
+    </section>
+
+    <section class="stats-strip" id="impact">
+      <div><span class="stat-icon">◎</span><span><b id="publicTotal">Community-powered</b><small>Everyday civic action</small></span></div>
+      <div><span class="stat-icon">↗</span><span><b>Transparent updates</b><small>From report to resolution</small></span></div>
+      <div><span class="stat-icon">⌖</span><span><b>Location-aware</b><small>Put issues on the map</small></span></div>
+      <div><span class="stat-icon">✳</span><span><b>Data-led decisions</b><small>Spot recurring problems</small></span></div>
+    </section>
+
+    <section class="section how-section" id="how">
+      <div class="section-head"><div><div class="eyebrow dark-eyebrow">A CLEARER WAY FORWARD</div><h2>From street-level problem<br>to <em>visible progress.</em></h2></div><p>No more wondering if someone received your complaint. Civicinity brings reporting, tracking, and civic action into one simple place.</p></div>
+      <div class="steps-grid">
+        <article class="step-card"><span class="step-number">01</span><div class="step-illustration ill-blue">⌖</div><h3>Report the issue</h3><p>Add a photo, location, category, and a short description. Your report receives a unique tracking ID.</p><span class="step-arrow">↗</span></article>
+        <article class="step-card"><span class="step-number">02</span><div class="step-illustration ill-orange">⇄</div><h3>Route to the right team</h3><p>Authorities can assign a responsible department, set priority, and update the status.</p><span class="step-arrow">↗</span></article>
+        <article class="step-card"><span class="step-number">03</span><div class="step-illustration ill-green">✓</div><h3>Follow the progress</h3><p>Check the complaint timeline, see resolution notes, and share feedback after closure.</p><span class="step-arrow">↗</span></article>
+      </div>
+    </section>
+
+    <section class="cta-band"><div><div class="eyebrow">YOUR NEIGHBOURHOOD NEEDS YOU</div><h2>Notice something?<br><em>Make it count.</em></h2></div><button class="btn btn-light btn-lg" id="ctaReport">Start a report <span>↗</span></button><div class="cta-orbit orbit-a"></div><div class="cta-orbit orbit-b"></div></section>
+
+    <section class="section auth-section hidden" id="authSection">
+      <div class="auth-card">
+        <div class="eyebrow dark-eyebrow">WELCOME TO CIVICINITY</div><h2 id="authTitle">Welcome back.</h2><p id="authSubtitle">Log in to report issues and follow your complaints.</p>
+        <form id="authForm">
+          <div class="field hidden" id="nameField"><label for="authName">Full name</label><input id="authName" name="name" placeholder="Your name" autocomplete="name"></div>
+          <div class="field"><label for="authEmail">Email address</label><input id="authEmail" name="email" type="email" placeholder="you@example.com" required autocomplete="email"></div>
+          <div class="field"><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" placeholder="At least 8 characters" required minlength="8" autocomplete="current-password"></div>
+          <button class="btn btn-primary full-btn" id="authSubmit" type="submit">Log in <span>→</span></button>
+        </form>
+        <p class="auth-switch" id="authSwitch">New here? <button type="button" id="switchAuth">Create an account</button></p>
+      </div>
+    </section>
+
+    <section class="app-section hidden" id="appSection">
+      <div class="app-heading"><div><div class="eyebrow dark-eyebrow">CITIZEN SPACE</div><h2 id="appTitle">Your civic dashboard.</h2><p id="appDesc">Every report is a step towards a better neighbourhood.</p></div><button class="btn btn-outline" id="logoutBtn">Log out ↗</button></div>
+      <div class="dashboard-tabs" id="dashboardTabs"><button class="tab active" data-tab="myReports">My reports</button><button class="tab" data-tab="newReport">+ New report</button><button class="tab" data-tab="track">Track by ID</button></div>
+      <div id="citizenView">
+        <div class="dashboard-metrics" id="citizenMetrics"></div>
+        <div class="panel"><div class="panel-heading"><div><h3>Your reports</h3><p>Follow each complaint from submission to resolution.</p></div><select id="myStatusFilter"><option value="">All statuses</option><option>Submitted</option><option>Assigned</option><option>In Progress</option><option>Resolved</option><option>Rejected</option></select></div><div id="myReports" class="report-list"></div></div>
+      </div>
+      <div id="newReportView" class="hidden">
+        <div class="panel report-form-panel"><div class="panel-heading"><div><h3>Tell us what needs fixing</h3><p>Include enough detail so the right team can act.</p></div><span class="form-step">STEP 01 / 01</span></div>
+          <form id="reportForm" class="report-form">
+            <div class="field"><label for="issueTitle">Issue title *</label><input id="issueTitle" name="title" required minlength="5" maxlength="120" placeholder="e.g. Large pothole near the bus stop"></div>
+            <div class="form-row"><div class="field"><label for="issueCategory">Category *</label><select id="issueCategory" name="category" required><option value="">Choose issue type</option><option>Pothole / Damaged Road</option><option>Garbage Accumulation</option><option>Broken Streetlight</option><option>Water Leakage</option><option>Drainage Problem</option><option>Other</option></select></div><div class="field"><label for="issuePriority">Urgency</label><select id="issuePriority" name="priority"><option>Medium</option><option>High</option></select></div></div>
+            <div class="field"><label for="issueDescription">Description *</label><textarea id="issueDescription" name="description" required minlength="10" maxlength="2000" rows="4" placeholder="What happened? Is it affecting pedestrians, traffic, or nearby homes?"></textarea><small class="field-hint">Avoid including private or sensitive personal information.</small></div>
+            <div class="field"><label for="issueLocation">Location / landmark *</label><div class="input-with-button"><input id="issueLocation" name="location_text" required maxlength="250" placeholder="Street, area, nearby landmark"><button type="button" class="btn btn-outline" id="gpsBtn">⌖ Use GPS</button></div><small class="field-hint" id="gpsStatus">GPS is optional; you can enter the location manually.</small><input type="hidden" id="latitude" name="latitude"><input type="hidden" id="longitude" name="longitude"></div>
+            <div class="field"><label for="issuePhoto">Photo evidence (optional)</label><label class="upload-zone" for="issuePhoto"><span class="upload-symbol">↑</span><span><b id="uploadLabel">Choose a photo to attach</b><small>JPG, PNG or WEBP · Max 5 MB</small></span><input type="file" id="issuePhoto" name="photo" accept="image/jpeg,image/png,image/webp"></label></div>
+            <div class="form-actions"><span>Fields marked * are required.</span><button class="btn btn-primary btn-lg" type="submit" id="submitReport">Submit complaint <span>↗</span></button></div>
+          </form>
+        </div>
+      </div>
+      <div id="trackView" class="hidden"><div class="panel track-panel"><h3>Find a complaint</h3><p>Enter the tracking ID from your submission confirmation.</p><form id="trackForm" class="track-form"><input id="trackId" placeholder="e.g. CIV-2026-A1B2C3" required><button class="btn btn-primary" type="submit">Track complaint →</button></form><div id="trackResult"></div></div></div>
+      <div id="adminView" class="hidden">
+        <div class="dashboard-metrics" id="adminMetrics"></div>
+        <div class="admin-grid"><div class="panel"><div class="panel-heading"><div><h3>Complaint overview</h3><p>Live counts from the database.</p></div></div><div id="statusChart" class="bar-chart"></div></div><div class="panel"><div class="panel-heading"><div><h3>Issues by category</h3><p>Where the city needs attention.</p></div></div><div id="categoryChart" class="bar-chart"></div></div></div>
+        <div class="panel"><div class="panel-heading admin-list-heading"><div><h3>All complaints</h3><p>Review reports and update their status.</p></div><div class="filters"><input id="adminSearch" placeholder="Search ID, title, location"><select id="adminStatusFilter"><option value="">All statuses</option><option>Submitted</option><option>Assigned</option><option>In Progress</option><option>Resolved</option><option>Rejected</option></select></div></div><div id="adminReports" class="report-list"></div></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="footer-top"><a class="brand brand-footer" href="#"><span class="brand-mark">C</span><span>CIVIC<span class="brand-light">INICITY</span><small>SMART CIVIC RESPONSE</small></span></a><p>Better streets begin with people who care.</p><span class="footer-coordinate">18°31' N · 73°51' E</span></div><div class="footer-bottom"><span>© 2026 CIVICINITY · STUDENT PBL PROJECT</span><span>DESIGNED FOR A MORE RESPONSIVE CITY</span></div></footer>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop hidden" id="complaintModal"><div class="modal"><button class="modal-close" id="modalClose" aria-label="Close">×</button><div id="modalContent"></div></div></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+.node_modules/
+.env
+data/
+uploads/*
+!uploads/.gitkeep
+.DS_Store
+.env
+.env.*
+!.env.example
+node_modules/
+uploads/
