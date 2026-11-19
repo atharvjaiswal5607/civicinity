@@ -47,8 +47,36 @@ function switchTab(tab) {
   $("#trackView").classList.toggle("hidden",tab!=="track");
   if(tab==="myReports") loadCitizenReports();
 }
+
+function openCitizenTab(tab) {
+  // Remember the page the user wants to visit
+  state.activeTab = tab;
+
+  if (!state.user) {
+    // Track requires login; reporting opens registration
+    showAuth(tab === "newReport" ? "register" : "login");
+    return;
+  }
+
+  if (state.user.role !== "citizen") {
+    toast("This feature is available to citizen accounts.", true);
+    return;
+  }
+
+  showApp();
+  switchTab(tab);
+
+  $("#appSection").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
 function showApp() {
-  $("#authSection").classList.add("hidden"); $("#appSection").classList.remove("hidden"); $("#hero").scrollIntoView({behavior:"smooth",block:"start"});
+  $("#authSection").classList.add("hidden"); $("#appSection").classList.remove("hidden"); $("#appSection").scrollIntoView({
+  behavior: "smooth",
+  block: "start"
+});
   $("#mainNav").innerHTML=`<a href="#how">How it works</a><a href="#impact">Our impact</a><button class="btn btn-outline" id="navDashboard">Dashboard</button><button class="btn btn-primary" id="navReport">Report an issue ↗</button>`;
   $("#navDashboard").onclick=()=>$("#appSection").scrollIntoView({behavior:"smooth"});
   $("#navReport").onclick=()=>{ $("#appSection").scrollIntoView({behavior:"smooth"}); if(state.user.role==="citizen")switchTab("newReport"); };
@@ -61,7 +89,20 @@ function showApp() {
     $("#dashboardTabs").classList.remove("hidden"); $("#adminView").classList.add("hidden"); switchTab(state.activeTab||"myReports");
   }
 }
-function resetNav(){ $("#mainNav").innerHTML='<a href="#how">How it works</a><a href="#impact">Our impact</a><button class="btn btn-outline" id="loginNav">Log in</button><button class="btn btn-primary" id="reportNav">Report an issue ↗</button>'; $("#loginNav").onclick=()=>showAuth("login"); $("#reportNav").onclick=()=>{if(state.user){showApp();switchTab("newReport")}else showAuth("register")}; }
+function resetNav() {
+  $("#mainNav").innerHTML =
+    '<a href="#how">How it works</a>' +
+    '<a href="#impact">Our impact</a>' +
+    '<button class="btn btn-outline" id="loginNav">Log in</button>' +
+    '<button class="btn btn-primary" id="reportNav">Report an issue ↗</button>';
+
+  $("#loginNav").onclick = () => showAuth("login");
+
+  $("#reportNav").onclick = () => {
+    openCitizenTab("newReport");
+  };
+}
+
 async function boot() {
   resetNav();
   if(state.token) {
@@ -73,14 +114,37 @@ async function boot() {
 function initMiniMap() {
   if(!window.L || state.miniMap) return;
   state.miniMap=L.map("miniMap",{zoomControl:false,scrollWheelZoom:false,dragging:false}).setView([18.5204,73.8567],12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:'© OpenStreetMap contributors'}).addTo(state.miniMap);
+
+
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 19,
+  referrerPolicy: "strict-origin-when-cross-origin"
+}).addTo(state.miniMap);
+
+
   [[18.5204,73.8567,"#dc6258"],[18.5314,73.8446,"#eab04d"],[18.5074,73.8752,"#498ab0"],[18.535,73.872,"#dc6258"],[18.514,73.84,"#eab04d"]].forEach(([lat,lng,color])=>L.circleMarker([lat,lng],{radius:7,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).addTo(state.miniMap));
   setTimeout(()=>state.miniMap.invalidateSize(),250);
 }
-$("#loginNav").onclick=()=>showAuth("login");
-$("#reportNav").onclick=()=>state.user?(showApp(),state.user.role==="citizen"&&switchTab("newReport")):showAuth("register");
-$("#heroReport").onclick=$("#ctaReport").onclick=()=>state.user?(showApp(),state.user.role==="citizen"&&switchTab("newReport")):showAuth("register");
-$("#trackOpen").onclick=()=>state.user?(showApp(),switchTab("track")):showAuth("login");
+
+$("#loginNav").onclick = () => showAuth("login");
+
+$("#reportNav").onclick = () => {
+  openCitizenTab("newReport");
+};
+
+$("#heroReport").onclick = () => {
+  openCitizenTab("newReport");
+};
+
+$("#ctaReport").onclick = () => {
+  openCitizenTab("newReport");
+};
+
+$("#trackOpen").onclick = () => {
+  openCitizenTab("track");
+};
+
 $("#homeLink").onclick=(e)=>{e.preventDefault();showPublic();};
 $("#menuBtn").onclick=()=>$("#mainNav").classList.toggle("open");
 $("#authForm").addEventListener("submit",async e=>{
@@ -106,19 +170,54 @@ $("#gpsBtn").onclick=()=>{
   },err=>{status.textContent=err.code===1?"Location permission denied. You can enter the location manually.":"Could not get GPS. Enter the location manually.";},{enableHighAccuracy:true,timeout:10000});
 };
 $("#issuePhoto").onchange=()=>$("#uploadLabel").textContent=$("#issuePhoto").files[0]?.name||"Choose a photo to attach";
-$("#reportForm").onsubmit=async e=>{
-  e.preventDefault(); const btn=$("#submitReport");btn.disabled=true;btn.textContent="Submitting…";
+
+$("#reportForm").onsubmit = async e => {
+  e.preventDefault();
+
+  // Store the form before starting asynchronous operations
+  const form = e.currentTarget;
+
+  const btn = $("#submitReport");
+  btn.disabled = true;
+  btn.textContent = "Submitting…";
+
   try {
-    const fd=new FormData(e.currentTarget);
-    const d=await api("/api/complaints",{method:"POST",body:fd});
-    e.currentTarget.reset();$("#uploadLabel").textContent="Choose a photo to attach";$("#gpsStatus").textContent="GPS is optional; you can enter the location manually.";
-    $("#latitude").value=$("#longitude").value="";
-    await loadCitizenReports();switchTab("myReports");
+    const fd = new FormData(form);
+
+    // Send complaint to the backend
+    const d = await api("/api/complaints", {
+      method: "POST",
+      body: fd
+    });
+
+    // Reset the original form safely
+    form.reset();
+
+    $("#uploadLabel").textContent = "Choose a photo to attach";
+    $("#gpsStatus").textContent =
+      "GPS is optional; you can enter the location manually.";
+
+    $("#latitude").value = "";
+    $("#longitude").value = "";
+
+    // Refresh the complaint list
+    await loadCitizenReports();
+
+    // Open the submitted complaint
+    switchTab("myReports");
     openComplaint(d.complaint.tracking_id);
+
     toast("Complaint submitted successfully.");
-  }catch(err){toast(err.message,true);}
-  finally{btn.disabled=false;btn.innerHTML='Submit complaint <span>↗</span>';}
+
+  } catch (err) {
+    toast(err.message, true);
+
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit complaint <span>↗</span>';
+  }
 };
+
 $("#trackForm").onsubmit=async e=>{e.preventDefault();try{await renderTracking($("#trackId").value.trim().toUpperCase(),"#trackResult");}catch(err){$("#trackResult").innerHTML=`<div class="empty-state">${esc(err.message)}</div>`;}};
 $("#modalClose").onclick=()=>$("#complaintModal").classList.add("hidden");
 $("#complaintModal").onclick=e=>{if(e.target===$("#complaintModal"))$("#complaintModal").classList.add("hidden");};
