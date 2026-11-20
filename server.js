@@ -126,15 +126,27 @@ app.use(express.static(path.join(ROOT, "public")));
 
 const registerAdmin = async () => {
   const email = (process.env.ADMIN_EMAIL || "admin@civicinity.local").toLowerCase();
-  const existing = db.prepare("SELECT id FROM users WHERE email=?").get(email);
+  const password = process.env.ADMIN_PASSWORD;
+  const name = process.env.ADMIN_NAME || "Civicinity Administrator";
+
+  const existing = db.prepare("SELECT id, role FROM users WHERE email=?").get(email);
+
   if (!existing) {
-    const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD || "ChangeMe123!", 12);
+    const hash = await bcrypt.hash(password || "ChangeMe123!", 12);
+
     db.prepare("INSERT INTO users(name,email,password_hash,role) VALUES(?,?,?,'admin')")
-      .run(process.env.ADMIN_NAME || "Civicinity Administrator", email, hash);
+      .run(name, email, hash);
+
     console.log(`Seeded admin account: ${email}`);
+  } else if (existing.role === "admin" && password) {
+    const hash = await bcrypt.hash(password, 12);
+
+    db.prepare("UPDATE users SET name=?, password_hash=? WHERE id=?")
+      .run(name, hash, existing.id);
+
+    console.log(`Updated admin account: ${email}`);
   }
 };
-
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "Civicinity API" }));
 
 app.post("/api/auth/register", async (req, res) => {
